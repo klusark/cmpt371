@@ -20,7 +20,7 @@ public class ProxyCache {
 	public static void init(int p) {
 		port = p;
 		try {
-			socket = /* Fill in */;
+			socket = new ServerSocket(port)/* Fill in */;
 		} catch (IOException e) {
 			System.out.println("Error creating socket: " + e);
 			System.exit(-1);
@@ -38,8 +38,8 @@ public class ProxyCache {
 
 		/* Read request */
 		try {
-			BufferedReader fromClient = /* Fill in */;
-			request = /* Fill in */;
+			BufferedReader fromClient = new BufferedReader(new InputStreamReader(client.getInputStream()))/* Fill in */;
+			request = new HttpRequest(fromClient)/* Fill in */;
 		} catch (IOException e) {
 			System.out.println("Error reading request from client: " + e);
 			return;
@@ -47,9 +47,11 @@ public class ProxyCache {
 		/* Send request to server */
 		try {
 			/* Open socket and write request to socket */
-			server = /* Fill in */;
-			DataOutputStream toServer = /* Fill in */;
+			server = new Socket(request.getHost(), request.getPort())/* Fill in */;
+			DataOutputStream toServer = new DataOutputStream(server.getOutputStream())/* Fill in */;
 			/* Fill in */
+			toServer.writeChars(request.toString());
+			System.out.println(request.toString());
 		} catch (UnknownHostException e) {
 			System.out.println("Unknown host: " + request.getHost());
 			System.out.println(e);
@@ -60,11 +62,12 @@ public class ProxyCache {
 		}
 		/* Read response and forward it to client */
 		try {
-			DataInputStream fromServer = /* Fill in */;
-			response = /* Fill in */;
-			DataOutputStream toClient = /* Fill in */;
+			DataInputStream fromServer = new DataInputStream(server.getInputStream())/* Fill in */;
+			response = new HttpResponse(fromServer);/* Fill in */;
+			DataOutputStream toClient = new DataOutputStream(client.getOutputStream())/* Fill in */;
 			/* Fill in */
 			/* Write response to client. First headers, then body */
+			toClient.writeChars(response.toString());
 			client.close();
 			server.close();
 			/* Code to insert object into the cache goes here. */
@@ -97,7 +100,7 @@ public class ProxyCache {
 
 		while (true) {
 			try {
-				client = /* Fill in */;
+				client = socket.accept()/* Fill in */;
 				handle(client);
 			} catch (IOException e) {
 				System.out.println("Error reading request from client: " + e);

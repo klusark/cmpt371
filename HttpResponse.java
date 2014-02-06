@@ -33,8 +33,8 @@ public class HttpResponse {
 
 		/* First read status line and response headers */
 		try {
-			String line = /* Fill in */;
-			while (line.length() != 0) {
+			String line = fromServer.readLine()/* Fill in */;
+			while (line != null && line.length() != 0) {
 				if (!gotStatusLine) {
 					statusLine = line;
 					gotStatusLine = true;
@@ -48,8 +48,8 @@ public class HttpResponse {
 				 * header "Content-Length", others return
 				 * "Content-length". You need to check for both
 				 * here. */
-				if (line.startsWith(/* Fill in */) ||
-					line.startsWith(/* Fill in */)) {
+				String clen = line.toLowerCase();
+				if (clen.startsWith("content-length")) {
 					String[] tmp = line.split(" ");
 					length = Integer.parseInt(tmp[1]);
 				}
@@ -79,7 +79,7 @@ public class HttpResponse {
 			 * response. */
 			while (bytesRead < length || loop) {
 				/* Read it in as binary data */
-				int res = /* Fill in */;
+				int res = fromServer.read(buf, bytesRead, BUF_SIZE);/* Fill in */;
 				if (res == -1) {
 					break;
 				}
@@ -87,6 +87,7 @@ public class HttpResponse {
 				 * the maximum object size. */
 				for (int i = 0; i < res && (i + bytesRead) < MAX_OBJECT_SIZE; i++) {
 					/* Fill in */
+					body[i + bytesRead] = buf[i];
 				}
 				bytesRead += res;
 			}
