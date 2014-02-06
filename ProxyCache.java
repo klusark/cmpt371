@@ -28,6 +28,7 @@ public class ProxyCache {
 	}
 
 	public static void handle(Socket client) {
+		System.out.println("New connection!\n");
 		Socket server = null;
 		HttpRequest request = null;
 		HttpResponse response = null;
@@ -50,8 +51,7 @@ public class ProxyCache {
 			server = new Socket(request.getHost(), request.getPort())/* Fill in */;
 			DataOutputStream toServer = new DataOutputStream(server.getOutputStream())/* Fill in */;
 			/* Fill in */
-			toServer.writeChars(request.toString());
-			System.out.println(request.toString());
+			toServer.writeBytes(request.toString());
 		} catch (UnknownHostException e) {
 			System.out.println("Unknown host: " + request.getHost());
 			System.out.println(e);
@@ -67,7 +67,7 @@ public class ProxyCache {
 			DataOutputStream toClient = new DataOutputStream(client.getOutputStream())/* Fill in */;
 			/* Fill in */
 			/* Write response to client. First headers, then body */
-			toClient.writeChars(response.toString());
+			toClient.writeBytes(response.toString());
 			client.close();
 			server.close();
 			/* Code to insert object into the cache goes here. */

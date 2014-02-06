@@ -16,7 +16,7 @@ public class HttpResponse {
 	final static int BUF_SIZE = 8192;
 	/** Maximum size of objects that this proxy can handle. For the
 	 * moment set to 100 KB. You can adjust this as needed. */
-	final static int MAX_OBJECT_SIZE = 100000;
+	final static int MAX_OBJECT_SIZE = 1000000;
 	/** Reply status and headers */
 	String version;
 	int status;
@@ -78,8 +78,9 @@ public class HttpResponse {
 			 * closed (when there is no Connection-Length in the
 			 * response. */
 			while (bytesRead < length || loop) {
+				System.out.println(bytesRead);
 				/* Read it in as binary data */
-				int res = fromServer.read(buf, bytesRead, BUF_SIZE);/* Fill in */;
+				int res = fromServer.read(buf, 0, BUF_SIZE);/* Fill in */;
 				if (res == -1) {
 					break;
 				}
@@ -110,6 +111,8 @@ public class HttpResponse {
 		res = statusLine + CRLF;
 		res += headers;
 		res += CRLF;
+
+		//res += new String(body);
 
 		return res;
 	}

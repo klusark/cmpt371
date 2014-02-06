@@ -23,14 +23,17 @@ public class HttpRequest {
 	private int port;
 
 	/** Create HttpRequest by reading it from the client socket */
-	public HttpRequest(BufferedReader from) {
+	public HttpRequest(BufferedReader from) throws IOException {
 		String firstLine = "";
 		try {
 			firstLine = from.readLine();
 		} catch (IOException e) {
 			System.out.println("Error reading request line: " + e);
 		}
-
+		if (firstLine == null) {
+			throw new IOException();
+		}
+		System.out.println(firstLine);
 		String[] tmp = firstLine.split(" ");
 		method = tmp[0];/* Fill in */;
 		URI = tmp[1];/* Fill in */;
@@ -39,13 +42,15 @@ public class HttpRequest {
 		System.out.println("URI is: " + URI);
 
 		if (!method.equals("GET")) {
-			System.out.println("Error: Method not GET");
+			throw new IOException("Error: Method not GET");
 		}
 
 		try {
 			String line = from.readLine();
 			while (line.length() != 0) {
-				headers += line + CRLF;
+				if (!line.startsWith("Accept-Encoding:")) {
+					headers += line + CRLF;
+				}
 				/* We need to find host header to know which server to
 				 * contact in case the request URI is not complete. */
 				if (line.startsWith("Host:")) {
