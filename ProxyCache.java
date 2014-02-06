@@ -27,59 +27,6 @@ public class ProxyCache {
 		}
 	}
 
-	public static void handle(Socket client) {
-		System.out.println("New connection!\n");
-		Socket server = null;
-		HttpRequest request = null;
-		HttpResponse response = null;
-
-		/* Process request. If there are any exceptions, then simply
-		 * return and end this request. This unfortunately means the
-		 * client will hang for a while, until it timeouts. */
-
-		/* Read request */
-		try {
-			BufferedReader fromClient = new BufferedReader(new InputStreamReader(client.getInputStream()))/* Fill in */;
-			request = new HttpRequest(fromClient)/* Fill in */;
-		} catch (IOException e) {
-			System.out.println("Error reading request from client: " + e);
-			return;
-		}
-		/* Send request to server */
-		try {
-			/* Open socket and write request to socket */
-			server = new Socket(request.getHost(), request.getPort())/* Fill in */;
-			DataOutputStream toServer = new DataOutputStream(server.getOutputStream())/* Fill in */;
-			/* Fill in */
-			toServer.writeBytes(request.toString());
-		} catch (UnknownHostException e) {
-			System.out.println("Unknown host: " + request.getHost());
-			System.out.println(e);
-			return;
-		} catch (IOException e) {
-			System.out.println("Error writing request to server: " + e);
-			return;
-		}
-		/* Read response and forward it to client */
-		try {
-			DataInputStream fromServer = new DataInputStream(server.getInputStream())/* Fill in */;
-			response = new HttpResponse(fromServer);/* Fill in */;
-			DataOutputStream toClient = new DataOutputStream(client.getOutputStream())/* Fill in */;
-			/* Fill in */
-			/* Write response to client. First headers, then body */
-			toClient.writeBytes(response.toString());
-			response.stream(fromServer, toClient);
-			client.close();
-			server.close();
-			System.out.println("Connection close");
-			/* Code to insert object into the cache goes here. */
-			/* NOT required for this assignment */
-		} catch (IOException e) {
-			System.out.println("Error writing response to client: " + e);
-		}
-	}
-
-
 	/** Read command line arguments and start proxy */
 	public static void main(String args[]) {
 		int myPort = 0;
@@ -103,7 +50,7 @@ public class ProxyCache {
 		while (true) {
 			try {
 				client = socket.accept()/* Fill in */;
-				handle(client);
+				new ProxyCacheThread(client);
 			} catch (IOException e) {
 				System.out.println("Error reading request from client: " + e);
 				/* Definitely cannot continue processing this request,

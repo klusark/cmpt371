@@ -14,13 +14,17 @@ public class HttpRequest {
 	final static String CRLF = "\r\n";
 	final static int HTTP_PORT = 80;
 	/** Store the request parameters */
-	String method;
+	String methodStr;
 	String URI;
 	String version;
 	String headers = "";
 	/** Server and port */
 	private String host;
 	private int port;
+	public enum Method {
+		GET, HEAD, UNSUPPORTED
+	}
+	Method method;
 
 	/** Create HttpRequest by reading it from the client socket */
 	public HttpRequest(BufferedReader from) throws IOException {
@@ -35,14 +39,18 @@ public class HttpRequest {
 		}
 		System.out.println(firstLine);
 		String[] tmp = firstLine.split(" ");
-		method = tmp[0];/* Fill in */;
+		methodStr = tmp[0];/* Fill in */;
 		URI = tmp[1];/* Fill in */;
 		version = tmp[2];/* Fill in */;
 
+		determineMethod(methodStr);
+
 		System.out.println("URI is: " + URI);
 
-		if (!method.equals("GET")) {
-			throw new IOException("Error: Method not GET");
+		//port = getPortFromString(URI);
+
+		if (method == Method.UNSUPPORTED) {
+			throw new IOException("Error Method not supported: " + methodStr);
 		}
 
 		try {
@@ -53,14 +61,8 @@ public class HttpRequest {
 				 * contact in case the request URI is not complete. */
 				if (line.startsWith("Host:")) {
 					tmp = line.split(" ");
-					if (tmp[1].indexOf(':') > 0) {
-						String[] tmp2 = tmp[1].split(":");
-						host = tmp2[0];
-						port = Integer.parseInt(tmp2[1]);
-					} else {
-						host = tmp[1];
-						port = HTTP_PORT;
-					}
+					host = getHostFromString(tmp[1]);
+					port = getPortFromString(tmp[1]);
 				}
 				line = from.readLine();
 			}
@@ -69,6 +71,39 @@ public class HttpRequest {
 			return;
 		}
 		System.out.println("Host to contact is: " + host + " at port " + port);
+	}
+
+	void determineMethod(String str) {
+		if (str.equals("GET")) {
+			method = Method.GET;
+		} else if (str.equals("HEAD")) {
+			method = Method.HEAD;
+		} else {
+			method = Method.UNSUPPORTED;
+		}
+	}
+
+	public Method getMethod() {
+		return method;
+	}
+
+	String getHostFromString(String str) {
+		if (str.indexOf(':') > 0) {
+			String[] tmp2 = str.split(":");
+			return tmp2[0];
+		} else {
+			return str;
+		}
+	}
+
+
+	int getPortFromString(String str) {
+		if (str.indexOf(':') > 0) {
+			String[] tmp2 = str.split(":");
+			return Integer.parseInt(tmp2[1]);
+		} else {
+			return HTTP_PORT;
+		}
 	}
 
 	/** Return host for which this request is intended */

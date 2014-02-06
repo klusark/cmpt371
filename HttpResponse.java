@@ -23,9 +23,11 @@ public class HttpResponse {
 	String headers = "";
 	/* Length of the object */
 	int length = -1;
+	HttpRequest request;
 
 	/** Read response from server. */
-	public HttpResponse(DataInputStream fromServer) {
+	public HttpResponse(DataInputStream fromServer, HttpRequest r) {
+		request = r;
 		boolean gotStatusLine = false;
 
 		/* First read status line and response headers */
@@ -57,6 +59,9 @@ public class HttpResponse {
 			return;
 		}
 
+		if (request.getMethod() == HttpRequest.Method.HEAD) {
+			length = 0;
+		}
 
 	}
 
