@@ -48,9 +48,7 @@ public class HttpRequest {
 		try {
 			String line = from.readLine();
 			while (line.length() != 0) {
-				if (!line.startsWith("Accept-Encoding:")) {
-					headers += line + CRLF;
-				}
+				headers += line + CRLF;
 				/* We need to find host header to know which server to
 				 * contact in case the request URI is not complete. */
 				if (line.startsWith("Host:")) {

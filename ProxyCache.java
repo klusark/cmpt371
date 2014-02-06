@@ -68,8 +68,10 @@ public class ProxyCache {
 			/* Fill in */
 			/* Write response to client. First headers, then body */
 			toClient.writeBytes(response.toString());
+			response.stream(fromServer, toClient);
 			client.close();
 			server.close();
+			System.out.println("Connection close");
 			/* Code to insert object into the cache goes here. */
 			/* NOT required for this assignment */
 		} catch (IOException e) {
