@@ -6,6 +6,8 @@ import java.util.*;
 public class ProxyCacheThread implements Runnable {
 	Socket client = null;
 	Socket server = null;
+	HttpRequest request = null;
+	HttpResponse response = null;
 	Thread t = null;
 
 	ProxyCacheThread(Socket c) {
@@ -15,9 +17,13 @@ public class ProxyCacheThread implements Runnable {
 	}
 
 	public void run() {
+		System.out.println("New connection!\n");
 		try {
-			runStuff();
+			readRequest();
+			sendRequest();
+			readWriteResponse();
 		} catch(Exception e) {
+			System.out.println("Exception: " + e);
 		}
 		try {
 			if (client != null) {
@@ -31,11 +37,8 @@ public class ProxyCacheThread implements Runnable {
 		}
 		System.out.println("Connection close");
 	}
-	void runStuff() {
-		System.out.println("New connection!\n");
-		HttpRequest request = null;
-		HttpResponse response = null;
 
+	void readRequest() {
 		/* Process request. If there are any exceptions, then simply
 		 * return and end this request. This unfortunately means the
 		 * client will hang for a while, until it timeouts. */
@@ -48,6 +51,9 @@ public class ProxyCacheThread implements Runnable {
 			System.out.println("Error reading request from client: " + e);
 			return;
 		}
+	}
+
+	void sendRequest() {
 		System.out.println("Send request");
 		/* Send request to server */
 		try {
@@ -64,6 +70,9 @@ public class ProxyCacheThread implements Runnable {
 			System.out.println("Error writing request to server: " + e);
 			return;
 		}
+	}
+
+	void readWriteResponse() {
 		System.out.println("Read/write response");
 		/* Read response and forward it to client */
 		try {
