@@ -5,6 +5,7 @@ import java.util.*;
 
 public class ProxyCacheThread implements Runnable {
 	Socket client = null;
+	Socket server = null;
 	Thread t = null;
 
 	ProxyCacheThread(Socket c) {
@@ -14,8 +15,24 @@ public class ProxyCacheThread implements Runnable {
 	}
 
 	public void run() {
+		try {
+			runStuff();
+		} catch(Exception e) {
+		}
+		try {
+			if (client != null) {
+				client.close();
+			}
+			if (server != null) {
+				server.close();
+			}
+		} catch (IOException e) {
+			System.out.println("Error closing the connections: " + e);
+		}
+		System.out.println("Connection close");
+	}
+	void runStuff() {
 		System.out.println("New connection!\n");
-		Socket server = null;
 		HttpRequest request = null;
 		HttpResponse response = null;
 
@@ -65,13 +82,6 @@ public class ProxyCacheThread implements Runnable {
 		} catch (IOException e) {
 			System.out.println("Error writing response to client: " + e);
 		}
-		try {
-			client.close();
-			server.close();
-		} catch (IOException e) {
-			System.out.println("Error closing the connections: " + e);
-		}
-		System.out.println("Connection close");
 	}
 
 }
