@@ -38,7 +38,7 @@ public class ProxyCacheThread implements Runnable {
 		System.out.println("Connection close");
 	}
 
-	void readRequest() {
+	void readRequest() throws Exception {
 		/* Process request. If there are any exceptions, then simply
 		 * return and end this request. This unfortunately means the
 		 * client will hang for a while, until it timeouts. */
@@ -49,11 +49,11 @@ public class ProxyCacheThread implements Runnable {
 			request = new HttpRequest(fromClient)/* Fill in */;
 		} catch (IOException e) {
 			System.out.println("Error reading request from client: " + e);
-			return;
+			throw e;
 		}
 	}
 
-	void sendRequest() {
+	void sendRequest() throws Exception {
 		System.out.println("Send request");
 		/* Send request to server */
 		try {
@@ -65,14 +65,14 @@ public class ProxyCacheThread implements Runnable {
 		} catch (UnknownHostException e) {
 			System.out.println("Unknown host: " + request.getHost());
 			System.out.println(e);
-			return;
+			throw e;
 		} catch (IOException e) {
 			System.out.println("Error writing request to server: " + e);
-			return;
+			throw e;
 		}
 	}
 
-	void readWriteResponse() {
+	void readWriteResponse() throws Exception {
 		System.out.println("Read/write response");
 		/* Read response and forward it to client */
 		try {
@@ -90,6 +90,7 @@ public class ProxyCacheThread implements Runnable {
 			/* NOT required for this assignment */
 		} catch (IOException e) {
 			System.out.println("Error writing response to client: " + e);
+			throw e;
 		}
 	}
 
