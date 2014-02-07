@@ -17,7 +17,6 @@ public class HttpRequest {
 	String methodStr;
 	String URI;
 	String version;
-	String headers = "";
 	/** Server and port */
 	private String host;
 	private int port;
@@ -29,6 +28,7 @@ public class HttpRequest {
 
 	// The method being used
 	Method method;
+	HttpHeaders _headers = null;
 
 	/** Create HttpRequest by reading it from the client socket */
 	public HttpRequest(BufferedReader from) throws IOException {
@@ -56,22 +56,17 @@ public class HttpRequest {
 		}
 
 		try {
-			String line = from.readLine();
-			while (line.length() != 0) {
-				headers += line + CRLF;
-				/* We need to find host header to know which server to
-				 * contact in case the request URI is not complete. */
-				if (line.startsWith("Host:")) {
-					tmp = line.split(" ");
-					host = getHostFromString(tmp[1]);
-					port = getPortFromString(tmp[1]);
-				}
-				line = from.readLine();
-			}
+			_headers = new HttpHeaders(from);
 		} catch (IOException e) {
 			System.out.println("Error reading from socket: " + e);
 			return;
 		}
+
+		String hostHeader = _headers.getHeader("Host");
+
+		host = getHostFromString(hostHeader);
+		port = getPortFromString(hostHeader);
+
 		System.out.println("Host to contact is: " + host + " at port " + port);
 	}
 
@@ -125,7 +120,7 @@ public class HttpRequest {
 		String req = "";
 
 		req = method + " " + URI + " " + version + CRLF;
-		req += headers;
+		req += _headers.toString();
 		/* This proxy does not support persistent connections */
 		req += "Connection: close" + CRLF;
 		req += CRLF;
