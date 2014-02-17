@@ -1,0 +1,30 @@
+I implemented the proxy as described in the assignment. I also decided to fix a
+few issues that the original code has.
+
+1. I removed the static buffer. Instead of buffering the entire file, I read
+   from the socket input and them immidiately write to the output socket.
+   Optimally this would occur on two seperate threads in order to maximize
+   performance, but I did not think it nessicary.
+
+2. I split the connection logic into a seperate thread (ProxyCacheTread.java).
+   This immensly improves the responsivness of the proxy when used by a browser.
+   Before, the client would need to wait for whatever request is currently being
+   processed to finish before it starts on the next one, but this can cuase
+   major issues if a server times out, or if there are a large number of
+   resources that the browser expects to be fetching at the same time. This also
+   has the added benefit of limiting thrown expeptions and the subsiquent error
+   handling to the thread that the error occurs on.
+
+3. I implemented the HEAD request method. I was going to try to implement POST,
+   but it seems to me that the Proxy Server was written only with GET in mind,
+   making it rather annoying to try to retrofit it with POST support.
+
+
+I was not really a fan of this assignment. For a third year course I think it is
+fair to expect people to be able to use any language you want them to. I also
+would much rather have implemented the entire ProxyServer from scratch myself. I
+think that would have been a better learning oppertunity for me. I finished the
+assignment as defined on the website during the class it was assigned, but spent
+a few more hours working on the additions above. I really love long challening
+programming assignments. I really hope Programming Assignment #2 will be one of
+them.
