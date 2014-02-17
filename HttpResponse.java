@@ -42,11 +42,9 @@ public class HttpResponse {
 				}
 
 				/* Get length of content as indicated by
-				 * Content-Length header. Unfortunately this is not
-				 * present in every response. Some servers return the
-				 * header "Content-Length", others return
-				 * "Content-length". You need to check for both
-				 * here. */
+				 * Content-Length header. */
+
+				// Convert it to lower case so we only have to check it once
 				String clen = line.toLowerCase();
 				if (clen.startsWith("content-length")) {
 					String[] tmp = line.split(" ");
@@ -59,6 +57,8 @@ public class HttpResponse {
 			return;
 		}
 
+		// if it's head there is nothing to read, regardless of what the server
+		// says
 		if (request.getMethod() == HttpRequest.Method.HEAD) {
 			length = 0;
 		}
@@ -77,12 +77,8 @@ public class HttpResponse {
 				loop = true;
 			}
 
-			/* Read the body in chunks of BUF_SIZE and copy the chunk
-			 * into body. Usually replies come back in smaller chunks
-			 * than BUF_SIZE. The while-loop ends when either we have
-			 * read Content-Length bytes or when the connection is
-			 * closed (when there is no Connection-Length in the
-			 * response. */
+			// read BUF_SIZE chunks into buf and immediately send them to the
+			// client
 			while (bytesRead < length || loop) {
 				/* Read it in as binary data */
 				int res = from.read(buf, 0, BUF_SIZE);/* Fill in */;

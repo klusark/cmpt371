@@ -21,9 +21,13 @@ public class HttpRequest {
 	/** Server and port */
 	private String host;
 	private int port;
+
+	// The supported methods
 	public enum Method {
 		GET, HEAD, UNSUPPORTED
 	}
+
+	// The method being used
 	Method method;
 
 	/** Create HttpRequest by reading it from the client socket */
@@ -46,8 +50,6 @@ public class HttpRequest {
 		determineMethod(methodStr);
 
 		System.out.println("URI is: " + URI);
-
-		//port = getPortFromString(URI);
 
 		if (method == Method.UNSUPPORTED) {
 			throw new IOException("Error Method not supported: " + methodStr);

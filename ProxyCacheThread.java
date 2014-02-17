@@ -12,6 +12,7 @@ public class ProxyCacheThread implements Runnable {
 
 	ProxyCacheThread(Socket c) {
 		client = c;
+		// Create and start the Proxy Thread
 		t = new Thread(this, "Proxy Thread");
 		t.start();
 	}
@@ -40,8 +41,7 @@ public class ProxyCacheThread implements Runnable {
 
 	void readRequest() throws Exception {
 		/* Process request. If there are any exceptions, then simply
-		 * return and end this request. This unfortunately means the
-		 * client will hang for a while, until it timeouts. */
+		 * return and end this request.*/
 		System.out.println("Read request");
 		/* Read request */
 		try {

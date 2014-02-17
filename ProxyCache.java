@@ -49,7 +49,9 @@ public class ProxyCache {
 
 		while (true) {
 			try {
-				client = socket.accept()/* Fill in */;
+				client = socket.accept();
+				// We have a new connection, so just create a thread and hand
+				// off the socket
 				new ProxyCacheThread(client);
 			} catch (IOException e) {
 				System.out.println("Error reading request from client: " + e);
