@@ -44,6 +44,13 @@ public class PingClient
 						getPacket();
 						return;
 					}
+					int length = 0;
+					for (int i = 0; i < 1024; ++i) {
+						if (buf[i] == '\n') {
+							length = i+2;
+							break;
+						}
+					}
 					if (delta < min) {
 						min = delta;
 					}
@@ -51,7 +58,7 @@ public class PingClient
 						max = delta;
 					}
 					total += delta;
-					System.out.println(packet.getLength() +" bytes from " +
+					System.out.println(length +" bytes from " +
 										packet.getAddress().getHostAddress() + 
 										": seq="+current_seq+" time="+ delta+" ms");
 					++packets_received;
