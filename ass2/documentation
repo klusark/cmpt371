@@ -1,0 +1,115 @@
+Issues:
+None known
+
+Tests:
+1: No Loss. Everything worked as expected
+joel@lappy ~/code/cmpt371 % java PingClient 127.0.0.1 5000
+PING 127.0.0.1
+38 bytes from 127.0.0.1: seq=0 time=81.460395 ms
+38 bytes from 127.0.0.1: seq=1 time=13.241504 ms
+38 bytes from 127.0.0.1: seq=2 time=20.970804 ms
+38 bytes from 127.0.0.1: seq=3 time=192.931688 ms
+38 bytes from 127.0.0.1: seq=4 time=23.863524 ms
+38 bytes from 127.0.0.1: seq=5 time=190.800847 ms
+38 bytes from 127.0.0.1: seq=6 time=86.815662 ms
+38 bytes from 127.0.0.1: seq=7 time=105.897869 ms
+38 bytes from 127.0.0.1: seq=8 time=122.844917 ms
+38 bytes from 127.0.0.1: seq=9 time=105.750318 ms
+--- ping statistics ---
+10 packets transmitted, 10 received, 0% packet loss, time 10108 ms
+rtt min/avg/max = 13.241504/94.45775280000001/192.931688 ms
+
+2: Medium Loss. Everything worked as expected
+joel@lappy ~/code/cmpt371 % java PingClient 127.0.0.1 5000 
+PING 127.0.0.1
+38 bytes from 127.0.0.1: seq=0 time=216.537967 ms
+Timeout
+38 bytes from 127.0.0.1: seq=2 time=179.902244 ms
+Timeout
+38 bytes from 127.0.0.1: seq=4 time=103.099247 ms
+Timeout
+38 bytes from 127.0.0.1: seq=6 time=114.713098 ms
+Timeout
+38 bytes from 127.0.0.1: seq=8 time=126.137226 ms
+Timeout
+--- ping statistics ---
+10 packets transmitted, 5 received, 50% packet loss, time 11007 ms
+rtt min/avg/max = 103.099247/148.0779564/216.537967 ms
+
+3: High Loss. Everything worked as expected
+PING 127.0.0.1
+Timeout
+Timeout
+Timeout
+Timeout
+38 bytes from 127.0.0.1: seq=4 time=16.906226 ms
+Timeout
+Timeout
+Timeout
+Timeout
+Timeout
+--- ping statistics ---
+10 packets transmitted, 1 received, 90% packet loss, time 11043 ms
+rtt min/avg/max = 16.906226/16.906226/16.906226 ms
+
+4: Testing on a remote machine worked as expected. If I made the server have no
+   delay, the ping numbers were around 5 ms higher than they were using the ping
+   utility
+
+joel@lappy ~/code/cmpt371 % java PingClient jenkins.teichroeb.net 5000
+PING jenkins.teichroeb.net
+38 bytes from 192.227.163.172: seq=0 time=102.737199 ms
+38 bytes from 192.227.163.172: seq=1 time=77.636012 ms
+38 bytes from 192.227.163.172: seq=2 time=88.453464 ms
+38 bytes from 192.227.163.172: seq=3 time=77.969189 ms
+38 bytes from 192.227.163.172: seq=4 time=79.325574 ms
+38 bytes from 192.227.163.172: seq=5 time=101.166365 ms
+38 bytes from 192.227.163.172: seq=6 time=81.440718 ms
+38 bytes from 192.227.163.172: seq=7 time=84.44263 ms
+38 bytes from 192.227.163.172: seq=8 time=77.79758 ms
+38 bytes from 192.227.163.172: seq=9 time=76.546856 ms
+--- ping statistics ---
+10 packets transmitted, 10 received, 0% packet loss, time 10077 ms
+rtt min/avg/max = 76.546856/84.7515587/102.737199 ms
+joel@lappy ~/code/cmpt371 % ping jenkins.teichroeb.net -c 10
+PING jenkins.teichroeb.net (192.227.163.172) 56(84) bytes of data.
+64 bytes from . (192.227.163.172): icmp_seq=1 ttl=47 time=79.6 ms
+64 bytes from . (192.227.163.172): icmp_seq=2 ttl=47 time=76.7 ms
+64 bytes from . (192.227.163.172): icmp_seq=3 ttl=47 time=86.9 ms
+64 bytes from . (192.227.163.172): icmp_seq=4 ttl=47 time=80.7 ms
+64 bytes from . (192.227.163.172): icmp_seq=5 ttl=47 time=77.1 ms
+64 bytes from . (192.227.163.172): icmp_seq=6 ttl=47 time=79.5 ms
+64 bytes from . (192.227.163.172): icmp_seq=7 ttl=47 time=76.7 ms
+64 bytes from . (192.227.163.172): icmp_seq=8 ttl=47 time=83.4 ms
+64 bytes from . (192.227.163.172): icmp_seq=9 ttl=47 time=76.0 ms
+64 bytes from . (192.227.163.172): icmp_seq=10 ttl=47 time=75.8 ms
+
+--- jenkins.teichroeb.net ping statistics ---
+10 packets transmitted, 10 received, 0% packet loss, time 9012ms
+rtt min/avg/max/mdev = 75.846/79.295/86.922/3.429 ms
+
+
+5: Timing. The timing is off by around 50ms at most for the 10 pings. If you
+   look at the total time given by each call, it is always 10000 + time for the
+   last packet.
+
+6: Long delay. 0% loss and 1000ms delay on average. This one created issues for
+   me at first, but I fixed them by checking the seq number, and resetting the
+   timeout if I need to keep listening. All the packets that should be received
+   are received and there are no false positives.
+joel@lappy ~/code/cmpt371 % java PingClient 127.0.0.1 5000
+PING 127.0.0.1
+38 bytes from 127.0.0.1: seq=0 time=506.687802 ms
+38 bytes from 127.0.0.1: seq=1 time=634.057172 ms
+38 bytes from 127.0.0.1: seq=2 time=390.914501 ms
+Timeout
+Timeout
+Timeout
+38 bytes from 127.0.0.1: seq=6 time=404.361595 ms
+Timeout
+38 bytes from 127.0.0.1: seq=8 time=975.133744 ms
+38 bytes from 127.0.0.1: seq=9 time=675.839598 ms
+--- ping statistics ---
+10 packets transmitted, 6 received, 40% packet loss, time 10683 ms
+rtt min/avg/max = 390.914501/597.832402/975.133744 ms
+
